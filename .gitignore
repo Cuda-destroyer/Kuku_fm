@@ -1,0 +1,70 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.streamlit/secrets.toml.*
+!.streamlit/secrets.toml.example
+
+# Confidential Screenplays and Proprietary Data
+I Married a Broken Soldier. He was a Duke/
+*Broken Soldier*
+uploads/
+private_data/
+screenplays/
+raw_screenplays/
+data/raw/
+outputs/private/
+outputs/raw/
+*.zip
+*.txt
+!requirements.txt
+!runtime.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing & Linting
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs & Caches
+*.log
+logs/
+.cache/
+.cache_*/
+temp/
+tmp/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+desktop.ini
