@@ -14,8 +14,8 @@ private_data/
 screenplays/
 raw_screenplays/
 data/raw/
-outputs/private/
-outputs/raw/
+outputs/*
+!outputs/.gitkeep
 *.zip
 *.txt
 !requirements.txt

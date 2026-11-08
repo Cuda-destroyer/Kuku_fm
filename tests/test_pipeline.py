@@ -45,3 +45,7 @@ def test_end_to_end_pipeline_synthetic():
 
     pdf_out = ExportManager.export_pdf_report(state.valid_candidates)
     assert len(pdf_out) > 100
+
+    edl_out = ExportManager.export_cmx3600_edl(top)
+    assert "FCM: NON-DROP FRAME" in edl_out
+    assert "001" in edl_out
