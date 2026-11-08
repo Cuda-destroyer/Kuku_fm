@@ -1,9 +1,10 @@
 """
-Export generation utilities for JSON, CSV, Markdown, PDF, and logs.
+Export generation utilities for JSON, CSV, Markdown, PDF, CMX 3600 EDL, and logs.
 """
 import json
 import csv
 import io
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import pandas as pd
@@ -11,6 +12,25 @@ import pandas as pd
 from models.promo import PromoCandidate
 from models.schemas import EpisodeManifestItem
 from config.settings import settings
+
+
+def seconds_to_timecode(seconds: float, fps: float = 30.0) -> str:
+    """Converts floating point seconds into SMPTE timecode (HH:MM:SS:FF)."""
+    total_frames = int(round(max(0.0, seconds) * fps))
+    frames_per_sec = int(round(fps))
+    frames_per_min = frames_per_sec * 60
+    frames_per_hour = frames_per_min * 60
+
+    hours = total_frames // frames_per_hour
+    remainder = total_frames % frames_per_hour
+
+    minutes = remainder // frames_per_min
+    remainder = remainder % frames_per_min
+
+    secs = remainder // frames_per_sec
+    frames = remainder % frames_per_sec
+
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}:{frames:02d}"
 
 
 class ExportManager:
@@ -27,7 +47,6 @@ class ExportManager:
         """Generates CSV summary of candidates."""
         rows = []
         for c in candidates:
-            # Segment summary
             seg_str = "; ".join(f"[{s.episode_id} {s.start_timestamp}-{s.end_timestamp}]" for s in c.segments)
             rows.append({
                 "Rank": c.rank,
@@ -49,6 +68,40 @@ class ExportManager:
 
         df = pd.DataFrame(rows)
         return df.to_csv(index=False)
+
+    @classmethod
+    def export_cmx3600_edl(cls, candidate: PromoCandidate, fps: float = 30.0) -> str:
+        """
+        Generates industry-standard CMX 3600 Edit Decision List (EDL) file
+        directly importable into Adobe Premiere Pro, DaVinci Resolve, or Final Cut Pro.
+        """
+        clean_title = re.sub(r"[^A-Za-z0-9_]", "_", candidate.title)[:32]
+        lines = [
+            f"TITLE: {clean_title}",
+            "FCM: NON-DROP FRAME",
+            "",
+        ]
+
+        rec_in_sec = 0.0
+
+        for idx, seg in enumerate(candidate.segments):
+            event_num = f"{idx + 1:03d}"
+            src_in = seconds_to_timecode(seg.start_seconds, fps)
+            src_out = seconds_to_timecode(seg.end_seconds, fps)
+            dur = max(0.0, seg.end_seconds - seg.start_seconds)
+            rec_in = seconds_to_timecode(rec_in_sec, fps)
+            rec_out = seconds_to_timecode(rec_in_sec + dur, fps)
+            rec_in_sec += dur
+
+            clip_name = f"{seg.episode_id}.mp4"
+            comment = seg.selected_moment.replace("\n", " ")[:60]
+
+            lines.append(f"{event_num}  AX       V     C        {src_in} {src_out} {rec_in} {rec_out}")
+            lines.append(f"* FROM CLIP NAME: {clip_name}")
+            lines.append(f"* COMMENT: {comment}")
+            lines.append("")
+
+        return "\n".join(lines)
 
     @classmethod
     def export_markdown_report(cls, candidates: List[PromoCandidate], manifest: Optional[List[EpisodeManifestItem]] = None) -> str:
@@ -160,5 +213,4 @@ class ExportManager:
             doc.build(story)
             return buffer.getvalue()
         except Exception as e:
-            # Fallback simple text bytes if reportlab has any issue
             return f"PDF generation failed: {e}".encode("utf-8")

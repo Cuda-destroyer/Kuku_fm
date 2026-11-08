@@ -23,7 +23,7 @@ def render_exports(state: PipelineState):
 
     with c1:
         st.subheader("1. Standard Data Exports")
-        
+
         # JSON Export
         json_data = ExportManager.export_json(cands_to_export)
         st.download_button(
@@ -69,9 +69,36 @@ def render_exports(state: PipelineState):
 
     st.divider()
 
-    st.subheader("3. Processing Logs & Raw Response Trace")
+    # 3. Video Editing NLE EDL Export
+    st.subheader("3. Video Editing NLE Edit Decision List (CMX 3600 EDL)")
+    st.caption("Import directly into Adobe Premiere Pro, DaVinci Resolve, or Final Cut Pro timeline.")
+    
+    selected_promo_id = st.selectbox(
+        "Select Promo for Timeline EDL Export",
+        options=[c.promo_id for c in cands_to_export],
+        format_func=lambda pid: f"{pid} - {next((c.title for c in cands_to_export if c.promo_id == pid), '')}"
+    )
+
+    selected_cand = next((c for c in cands_to_export if c.promo_id == selected_promo_id), cands_to_export[0])
+    edl_content = ExportManager.export_cmx3600_edl(selected_cand)
+
+    col_edl_l, col_edl_r = st.columns([3, 1])
+    with col_edl_l:
+        st.text_area("CMX 3600 EDL Preview", edl_content, height=130)
+    with col_edl_r:
+        st.download_button(
+            label="🎬 Download .EDL File",
+            data=edl_content,
+            file_name=f"{selected_cand.promo_id}.edl",
+            mime="text/plain",
+            use_container_width=True,
+        )
+
+    st.divider()
+
+    st.subheader("4. Processing Logs & Raw Response Trace")
     log_text = "\n".join(state.logs) if state.logs else "No pipeline execution logs recorded."
-    st.text_area("Live Pipeline Logs", log_text, height=180)
+    st.text_area("Live Pipeline Logs", log_text, height=150)
     st.download_button(
         label="📜 Download Complete Execution Logs",
         data=log_text,
