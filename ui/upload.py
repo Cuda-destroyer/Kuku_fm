@@ -7,6 +7,7 @@ from pathlib import Path
 from core.ingestion import IngestionEngine
 from core.pipeline import PipelineState
 from config.settings import settings
+from ui import full_width
 
 
 def render_upload(state: PipelineState):
@@ -59,7 +60,7 @@ def render_upload(state: PipelineState):
         st.caption("Inspect screenplay scene counts, dialogue lines, and timestamp coverage before running AI discovery.")
 
         df_manifest = IngestionEngine.manifest_to_dataframe(state.manifest)
-        st.dataframe(df_manifest, use_container_width=True)
+        st.dataframe(df_manifest, **full_width())
 
         # Detailed script inspection
         with st.expander("🔍 Inspect Parsed Episode Details & Dialogue"):

@@ -5,6 +5,7 @@ import streamlit as st
 from typing import Optional
 from core.pipeline import PromoDiscoveryPipeline, PipelineState
 from llm.base_provider import BaseLLMProvider
+from ui import full_width
 
 
 def render_story_analysis(state: PipelineState, pipeline: PromoDiscoveryPipeline):
@@ -38,7 +39,7 @@ def render_story_analysis(state: PipelineState, pipeline: PromoDiscoveryPipeline
         st.markdown(f"**Provider Engine:** `{pipeline.provider.provider_name.upper()}`")
 
     # Start button
-    if st.button("🚀 START SCREENPLAY ANALYSIS", type="primary", use_container_width=True):
+    if st.button("🚀 START SCREENPLAY ANALYSIS", type="primary", **full_width()):
         progress_bar = st.progress(0.0)
         status_text = st.empty()
 

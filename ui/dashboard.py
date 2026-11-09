@@ -5,6 +5,7 @@ import streamlit as st
 import pandas as pd
 from typing import Optional
 from core.pipeline import PipelineState
+from ui import full_width
 
 
 def render_dashboard(state: Optional[PipelineState]):
@@ -66,7 +67,7 @@ def render_dashboard(state: Optional[PipelineState]):
                     "Score": f"{c.score:.1f}",
                     "Category": c.ranking_category,
                 })
-            st.dataframe(pd.DataFrame(top_list), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(top_list), hide_index=True, **full_width())
             st.caption("View detailed timestamps, script quotes, and score breakdowns in the **Ranked Promos** tab.")
         else:
             st.warning("No valid promo candidates generated yet. Run analysis in the **Story Analysis** tab.")

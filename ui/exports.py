@@ -5,6 +5,7 @@ import streamlit as st
 import json
 from utils.file_utils import ExportManager
 from core.pipeline import PipelineState
+from ui import full_width
 
 
 def render_exports(state: PipelineState):
@@ -31,7 +32,7 @@ def render_exports(state: PipelineState):
             data=json_data,
             file_name="kuku_promo_candidates.json",
             mime="application/json",
-            use_container_width=True,
+            **full_width(),
         )
 
         # CSV Export
@@ -41,7 +42,7 @@ def render_exports(state: PipelineState):
             data=csv_data,
             file_name="kuku_promo_candidates.csv",
             mime="text/csv",
-            use_container_width=True,
+            **full_width(),
         )
 
     with c2:
@@ -54,7 +55,7 @@ def render_exports(state: PipelineState):
             data=md_report,
             file_name="KUKU_PROMO_REPORT.md",
             mime="text/markdown",
-            use_container_width=True,
+            **full_width(),
         )
 
         # PDF Report
@@ -64,7 +65,7 @@ def render_exports(state: PipelineState):
             data=pdf_bytes,
             file_name="KUKU_PROMO_EXECUTIVE_SUMMARY.pdf",
             mime="application/pdf",
-            use_container_width=True,
+            **full_width(),
         )
 
     st.divider()
@@ -91,7 +92,7 @@ def render_exports(state: PipelineState):
             data=edl_content,
             file_name=f"{selected_cand.promo_id}.edl",
             mime="text/plain",
-            use_container_width=True,
+            **full_width(),
         )
 
     st.divider()
