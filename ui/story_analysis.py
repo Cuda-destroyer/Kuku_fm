@@ -19,14 +19,19 @@ def render_story_analysis(state: PipelineState, pipeline: PromoDiscoveryPipeline
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.markdown(f"**Loaded Episodes:** `{len(state.episodes)}` episodes ready for AI analysis.")
-        ep_limit = st.slider(
-            "Batch Size / Episodes to Analyze",
-            min_value=1,
-            max_value=len(state.episodes),
-            value=min(10, len(state.episodes)),
-            help="Select how many episodes to run through the AI discovery pipeline."
-        )
+        total_eps = len(state.episodes)
+        st.markdown(f"**Loaded Episodes:** `{total_eps}` episodes ready for AI analysis.")
+        if total_eps > 1:
+            ep_limit = st.slider(
+                "Batch Size / Episodes to Analyze",
+                min_value=1,
+                max_value=total_eps,
+                value=min(10, total_eps),
+                help="Select how many episodes to run through the AI discovery pipeline."
+            )
+        else:
+            ep_limit = 1
+            st.info("Single episode loaded: batch size automatically set to 1.")
 
     with col2:
         st.markdown(f"**Active Inference Model:** `{pipeline.provider.model_id}`")
